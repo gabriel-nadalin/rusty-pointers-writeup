@@ -95,6 +95,9 @@ remendado com interpreter relativo (`dist/lib/ld-linux-x86-64.so.2`) e
 `libdl.so.2` (o binário não importa nada dela). `flag.txt` fica na raiz para o
 `cat flag.txt` local.
 
+Requer `pwntools` (`requirements.txt`). O modo `--gdb` precisa de um emulador de
+terminal (`TERMINAL='tmux splitw -h' python3 exploit.py --gdb`, por exemplo).
+
 Resultado local: shell obtido e `cat flag.txt` imprime a flag. Símbolos
 (`system`, `__free_hook`) vêm do próprio `libc-2.31.so` distribuído.
 
@@ -110,8 +113,11 @@ python3 exploit.py --remote 127.0.0.1 --no-ssl
 
 No build, o binário vindo de `dist/` (remendado para o debug local) tem
 interpreter e RUNPATH restaurados para o padrão, então roda com a libc do
-container. Verificado: offsets (`0x1ecbe0`, `system`, `__free_hook`) batem com
-o `libc-2.31.so` distribuído.
+container. Verificado: offsets (`0x1ecbe0`, `system` = `0x52290`,
+`__free_hook` = `0x1eeb28`) batem com o `libc-2.31.so` distribuído.
+
+A base `ubuntu:20.04` não está fixada por digest; se a imagem for atualizada
+(patch de glibc), revalide esses offsets antes de confiar no exploit.
 
 O Dockerfile oficial (base kctf) não é reproduzível localmente sem o cluster
 kCTF, PoW e `--privileged`; para testar o exploit, este container basta.
